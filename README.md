@@ -50,7 +50,7 @@ age-calculator/
 
 1. Clone the repository:
 
-   git clone https://github.com/your-username/age-calculator.git  
+   git clone (https://github.com/subhajitkotal03/AGE-CALCULATOR.git)  
    cd age-calculator  
 
 2. Create a virtual environment (optional but recommended):
