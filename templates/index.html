@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Age Calculator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #dcefd1;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            min-width: 300px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #2d572c;
+        }
+
+        input[type="date"],
+        input[type="text"] {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            margin: 10px 0;
+            width: 90%;
+        }
+
+        button {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .result-box {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f1f8e9;
+            color: #33691e;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            min-width: 300px;
+            font-size: 18px;
+        }
+
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        /* Modal styles */
+        #history-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        #history-content {
+            background: #fff;
+            border-radius: 15px;
+            padding: 30px 20px;
+            min-width: 320px;
+            max-width: 90vw;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        #history-list {
+            text-align: left;
+            padding-left: 0;
+            list-style: none;
+        }
+        #history-list li {
+            margin-bottom: 10px;
+        }
+        #close-history-btn {
+            margin-top: 10px;
+            background: #e53935;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Enter your Name and Date of Birth</h1>
+        <form method="POST" onsubmit="return validateForm()">
+            <input type="text" id="name" name="name" placeholder="Your Name" required>
+            <input type="date" name="dob" required>
+            <button type="submit">Calculate Age</button>
+            <button type="button" onclick="showHistory()" style="margin-left:10px;background:#2196F3;">History</button>
+            <div id="error-message" class="error"></div>
+        </form>
+    </div>
+
+    {% if result %}
+        <div class="result-box">
+            <strong>{{ result }}</strong>
+        </div>
+    {% endif %}
+
+    <!-- History Modal -->
+    <div id="history-modal">
+        <div id="history-content">
+            <h2>History</h2>
+            <ul id="history-list"></ul>
+            <button id="close-history-btn" onclick="closeHistory()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        function validateForm() {
+            const name = document.getElementById("name").value.trim();
+            const errorDiv = document.getElementById("error-message");
+
+            if (name === "") {
+                errorDiv.textContent = "Please enter your name first.";
+                return false;
+            }
+
+            errorDiv.textContent = "";
+            return true;
+        }
+
+        function showHistory() {
+            fetch('/history')
+                .then(response => response.json())
+                .then(data => {
+                    const list = document.getElementById('history-list');
+                    list.innerHTML = "";
+                    if (data.length === 0) {
+                        list.innerHTML = "<li>No history found.</li>";
+                    } else {
+                        data.slice().reverse().forEach(item => {
+                            list.innerHTML += `<li><strong>${item.name}</strong>: ${item.age}<br><small>Checked on: ${item.date}</small></li><hr>`;
+                        });
+                    }
+                    document.getElementById('history-modal').style.display = 'flex';
+                });
+        }
+        function closeHistory() {
+            document.getElementById('history-modal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
